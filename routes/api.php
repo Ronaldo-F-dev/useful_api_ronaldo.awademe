@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UrlController;
+use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ModuleController;
-use App\Http\Controllers\UrlController;
+use App\Http\Middleware\CheckModuleActive;
 
 Route::get("/",function(){
     return [
@@ -23,11 +25,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post("/modules/{id}/deactivate",[ModuleController::class, "deactivate"]);
 });
 
+Route::get("/s/{code}",[UrlController::class, "redirectToLink"])->middleware(CheckModuleActive::class . ":1");
 
-Route::middleware("auth:sanctum")->group(
+Route::middleware(CheckModuleActive::class . ":1")->group(
     function(){
-        Route::post("/shorten",[UrlController::class,"add"]);
-        Route::get("/s/{code}",[UrlController::class, "redirectToLink"]);
 
+        Route::middleware("auth:sanctum")->group(
+            function(){
+                Route::post("/shorten",[UrlController::class,"add"]);
+                Route::get("/links",[UrlController::class,"links"]);
+                Route::delete("/links/{id}",[UrlController::class, "deleteLink"]);
+            }
+        );
     }
 );
