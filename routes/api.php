@@ -5,6 +5,7 @@ use App\Http\Controllers\UrlController;
 use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ModuleController;
+use App\Http\Controllers\WalletController;
 use App\Http\Middleware\CheckModuleActive;
 
 Route::get("/",function(){
@@ -39,3 +40,8 @@ Route::middleware(CheckModuleActive::class . ":1")->group(
         );
     }
 );
+
+Route::middleware("auth:sanctum")->group(
+    function(){
+Route::get("/wallet",[WalletController::class, "show"]);
+    });
