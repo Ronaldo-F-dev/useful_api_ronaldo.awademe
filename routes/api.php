@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 
 Route::get("/",function(){
@@ -10,3 +11,5 @@ Route::get("/",function(){
         "description" => "Useful API"
     ];
 });
+
+Route::post("/register",[AuthController::class,"register"]);
