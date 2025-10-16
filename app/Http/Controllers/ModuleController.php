@@ -29,6 +29,7 @@ class ModuleController extends Controller
                 $user_module = UserModule::where("user_id",$user->id)->where("module_id",$id)->get();
                 if(count($user_module) > 0){
                     $user_module[0]->active = true;
+                    $user_module[0]->save();
                 }else{
 
                     $user_module = UserModule::create([
@@ -60,6 +61,7 @@ class ModuleController extends Controller
             $user_module = UserModule::where("user_id",$user->id)->where("module_id",$id)->get();
             if(count($user_module) > 0){
                 $user_module[0]->active = false;
+                $user_module[0]->update();
             }else{
 
                 $user_module = UserModule::create([

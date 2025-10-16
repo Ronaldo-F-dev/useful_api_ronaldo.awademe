@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\ShortLink;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -42,16 +43,61 @@ class UrlController extends Controller
     public function redirectToLink(Request $request,$code)
     {
         try {
+            //$user = Auth::user();
             $link = ShortLink::where("code",$code)->get();
+            //dd($link);
             if(count($link) === 0){
                 return response()->json([],401);
             }
             $link = $link[0];
+            /*if($link->user_id != $user->id){
+                return response()->json([],403);
+            }*/
             $link->clicks++;
             $link->update();
             return response()->redirectTo($link->original_url,302);
         } catch (Exception $e) {
             return response()->json(["error" => $e->getMessage()],401);
+        }
+    }
+
+    public function links()
+    {
+        try {
+            $user = Auth::user();
+            $links = ShortLink::where("user_id",$user->id)->get();
+            
+            $linksFormated = [];
+            foreach ($links as $l) {
+                $linksFormated[] = [
+                    "id" => $l->id,
+                    "original_url" => $l->original_url,
+                    "code" => $l['code'],
+                    "clicks" => $l->clicks,
+                    "created_at" =>$l->created_at
+                ];
+            }
+            return response()->json($linksFormated);
+        } catch (\Throwable $th) {
+
+        }
+    }
+
+    public function deleteLink(Request $request,$id)
+    {
+        try {
+            $link = ShortLink::find($id);
+            if(!$link){
+                return response([],404);
+            }
+            $link->delete();
+            return response()->json([
+                "message" => "Link deleted successfully"
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                "error" => $e->getMessage()
+            ]);
         }
     }
 }
