@@ -26,10 +26,10 @@ class WalletController extends Controller
     {
         try {
             $user = Auth::user();
-        $validated = $request->validate([
-            "receiver_id" => "required|int|exists:users,id",
-            "amount" => "required|numeric|min:1|max:10000"
-        ]);
+            $validated = $request->validate([
+                "receiver_id" => "required|int|exists:users,id",
+                "amount" => "required|numeric|min:1|max:10000"
+            ]);
         $wallet = Wallet::where("user_id",$user->id)->get();
         $wallet = $wallet[0];
 
@@ -57,7 +57,7 @@ class WalletController extends Controller
                     "amount" =>$validated["amount"],
                     "status" => "success",
                     "created_at" => $transaction->created_at
-                ]);
+                ],201);
             }else{
                 return response()->json([
                     "error" => "Insuffisant amount"
@@ -72,5 +72,23 @@ class WalletController extends Controller
             ],401);
         }
 
+    }
+
+    public function topup(Request $request)
+    {
+        $user = Auth::user();
+        $validated = $request->validate([
+            "amount" => "required|numeric|min:1|max:10000"
+        ]);
+        $wallet = Wallet::where("user_id",$user->id)->get();
+        $wallet = $wallet[0];
+        $wallet->balance += $validated['amount'];
+        $wallet->save();
+        return response()->json([
+            "user_id" => $user->id,
+            "balance" => $wallet->balance,
+            "topup_amount" => $validated['amount'],
+            "created_at" => $wallet->balance->created_at
+        ],201);
     }
 }
