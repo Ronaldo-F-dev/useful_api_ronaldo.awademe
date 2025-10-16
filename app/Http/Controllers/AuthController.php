@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -18,7 +19,10 @@ class AuthController extends Controller
                 "password" => "required|string"
             ]);
             $user = User::create($validated);
-            $token = $user->createToken('auth_token')->plainTextToken;
+            $wallet = Wallet::create([
+                "user_id" => $user->id,
+                "balance" => 0.0
+            ]);
             return response()->json([
                 "id" => $user->id,
                 "name" => $user->name,
