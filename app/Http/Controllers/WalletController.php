@@ -91,4 +91,9 @@ class WalletController extends Controller
             "created_at" => $wallet->balance->created_at
         ],201);
     }
+
+    public function transactions(Request $request)
+    {
+        $user = Auth::user();
+    }
 }
