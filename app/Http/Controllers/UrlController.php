@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Exception;
-use App\Models\ShortLink;
 use App\Models\User;
+use App\Models\ShortLink;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -17,8 +18,11 @@ class UrlController extends Controller
             $user = Auth::user();
             $validated = $request->validate([
                 "original_url" => "required|url",
-                "custom_code" => "required|string|max:10|unique:short_links,code"
+                "custom_code" => "nullable|string|max:10|unique:short_links,code|regex:/^[a-zA-Z0-9_-]+$/"
             ]);
+            if(!isset($validated["custom_code"])){
+                $validated["custom_code"] = Str::random(10);
+            }
             $link = ShortLink::create([
                 "original_url" => $validated["original_url"],
                 "code" => $validated['custom_code'],
@@ -66,7 +70,7 @@ class UrlController extends Controller
         try {
             $user = Auth::user();
             $links = ShortLink::where("user_id",$user->id)->get();
-            
+
             $linksFormated = [];
             foreach ($links as $l) {
                 $linksFormated[] = [
