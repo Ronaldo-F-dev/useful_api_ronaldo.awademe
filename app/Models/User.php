@@ -6,6 +6,7 @@ namespace App\Models;
 use App\Models\Module;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -55,5 +56,9 @@ class User extends Authenticatable
     public function links()
     {
         return $this->hasMany(ShortLink::class,'user_id','id');
+    }
+    public function Wallet(): BelongsTo
+    {
+        return $this->belongsTo(Wallet::class);
     }
 }
