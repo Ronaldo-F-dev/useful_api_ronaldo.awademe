@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Models\ShortLink;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,12 +30,28 @@ class UrlController extends Controller
                 "code" => $link->code,
                 "clicks" => 0,
                 "created_at" => $link->created_at
-            ]);
+            ],201);
         }catch(ValidationException $e){
             return response()->json( [
                 "error" => $e->getMessage(),
             ],401);
         }
 
+    }
+
+    public function redirectToLink(Request $request,$code)
+    {
+        try {
+            $link = ShortLink::where("code",$code)->get();
+            if(count($link) === 0){
+                return response()->json([],401);
+            }
+            $link = $link[0];
+            $link->clicks++;
+            $link->update();
+            return response()->redirectTo($link->original_url,302);
+        } catch (Exception $e) {
+            return response()->json(["error" => $e->getMessage()],401);
+        }
     }
 }

@@ -27,6 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware("auth:sanctum")->group(
     function(){
         Route::post("/shorten",[UrlController::class,"add"]);
+        Route::get("/s/{code}",[UrlController::class, "redirectToLink"]);
 
     }
 );
