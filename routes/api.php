@@ -17,3 +17,8 @@ Route::post("/register",[AuthController::class,"register"]);
 Route::post("/login",[AuthController::class, "login"]);
 
 Route::get("/modules",[ModuleController::class,"index"]);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post("/modules/{id}/activate",[ModuleController::class, "activate"]);
+    Route::post("/modules/{id}/deactivate",[ModuleController::class, "deactivate"]);
+});

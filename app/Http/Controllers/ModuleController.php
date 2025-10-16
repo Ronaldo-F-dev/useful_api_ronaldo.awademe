@@ -3,48 +3,74 @@
 namespace App\Http\Controllers;
 
 use App\Models\Module;
+use App\Models\UserModule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class ModuleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index(Request $request)
     {
         $modules = Module::all();
         return response()->json($modules);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function activate(Request $request,int $id)
     {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Module $module)
-    {
-        //
-    }
+        try {
+            $user = Auth::user();
+            $module = Module::find($id);
+            if(!$module){
+                return response([],404);
+            }
+            $user_module = UserModule::where("user_id",$user->id)->where("module_id",$id)->get();
+            if(count($user_module) > 0){
+                $user_module[0]->active = true;
+            }else{
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Module $module)
-    {
-        //
-    }
+                $user_module = UserModule::create([
+                    "user_id" => $user->id,
+                    "module_id" => $id,
+                    "active" => true
+                ]);
+            }
+            return response()->json([
+                "message" => "Module activated"
+            ]);
+        } catch (ValidationException $e) {
+            return response([],404);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Module $module)
+    }
+    public function deactivate(Request $request,int $id)
     {
-        //
+
+        try {
+            $user = Auth::user();
+            $module = Module::find($id);
+            if(!$module){
+                return response([],404);
+            }
+            $user_module = UserModule::where("user_id",$user->id)->where("module_id",$id)->get();
+            if(count($user_module) > 0){
+                $user_module[0]->active = false;
+            }else{
+
+                $user_module = UserModule::create([
+                    "user_id" => $user->id,
+                    "module_id" => $id,
+                    "active" => false
+                ]);
+            }
+            return response()->json([
+                "message" => "Module deactivated"
+            ]);
+        } catch (ValidationException $e) {
+            return response([],404);
+        }
+
     }
 }
