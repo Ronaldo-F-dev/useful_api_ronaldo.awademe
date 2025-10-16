@@ -19,35 +19,38 @@ class ModuleController extends Controller
 
     public function activate(Request $request,int $id)
     {
+        if(Auth::check()){
+            try {
+                $user = Auth::user();
+                $module = Module::find($id);
+                if(!$module){
+                    return response([],404);
+                }
+                $user_module = UserModule::where("user_id",$user->id)->where("module_id",$id)->get();
+                if(count($user_module) > 0){
+                    $user_module[0]->active = true;
+                }else{
 
-        try {
-            $user = Auth::user();
-            $module = Module::find($id);
-            if(!$module){
+                    $user_module = UserModule::create([
+                        "user_id" => $user->id,
+                        "module_id" => $id,
+                        "active" => true
+                    ]);
+                }
+                return response()->json([
+                    "message" => "Module activated"
+                ]);
+            } catch (ValidationException $e) {
                 return response([],404);
             }
-            $user_module = UserModule::where("user_id",$user->id)->where("module_id",$id)->get();
-            if(count($user_module) > 0){
-                $user_module[0]->active = true;
-            }else{
-
-                $user_module = UserModule::create([
-                    "user_id" => $user->id,
-                    "module_id" => $id,
-                    "active" => true
-                ]);
-            }
-            return response()->json([
-                "message" => "Module activated"
-            ]);
-        } catch (ValidationException $e) {
-            return response([],404);
+        }else{
+            return response()->json([],401);
         }
 
     }
     public function deactivate(Request $request,int $id)
     {
-
+        if(Auth::check()){
         try {
             $user = Auth::user();
             $module = Module::find($id);
@@ -71,6 +74,9 @@ class ModuleController extends Controller
         } catch (ValidationException $e) {
             return response([],404);
         }
+    }else{
+        return response()->json([],401);
+    }
 
     }
 }
