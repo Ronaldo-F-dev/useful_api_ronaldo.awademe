@@ -19,8 +19,10 @@ class AuthController extends Controller
             $user = User::create($validated);
             $token = $user->createToken('auth_token')->plainTextToken;
             return response()->json([
-                $user,
-                $token
+                "id" => $user->id,
+                "name" => $user->name,
+                "email" => $user->email,
+                "created_at" => $user->created_at,
             ],201);
         } catch (ValidationException $e) {
             return response()->json([
