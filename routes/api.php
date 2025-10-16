@@ -44,4 +44,6 @@ Route::middleware(CheckModuleActive::class . ":1")->group(
 Route::middleware("auth:sanctum")->group(
     function(){
 Route::get("/wallet",[WalletController::class, "show"]);
+Route::post("/wallet/transfer",[WalletController::class, "transfert"]);
+
     });
