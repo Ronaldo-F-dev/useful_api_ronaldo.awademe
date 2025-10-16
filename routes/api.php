@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ModuleController;
-
+use App\Http\Controllers\UrlController;
 
 Route::get("/",function(){
     return [
@@ -22,3 +22,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post("/modules/{id}/activate",[ModuleController::class, "activate"]);
     Route::post("/modules/{id}/deactivate",[ModuleController::class, "deactivate"]);
 });
+
+
+Route::middleware("auth:sanctum")->group(
+    function(){
+        Route::post("/shorten",[UrlController::class,"add"]);
+
+    }
+);
