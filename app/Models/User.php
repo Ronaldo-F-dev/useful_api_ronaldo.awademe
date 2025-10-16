@@ -52,4 +52,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Module::class, 'user_id', 'id');
     }
+    public function links()
+    {
+        return $this->hasMany(ShortLink::class,'user_id','id');
+    }
 }
